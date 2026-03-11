@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Felipe Flores — Software Engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@300;400;500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #080c10;
+      --surface:   #0d1318;
+      --border:    #1a2530;
+      --cyan:      #00e5ff;
+      --cyan-dim:  #00b8cc;
+      --green:     #39ff14;
+      --amber:     #ffb300;
+      --text:      #c8d8e4;
+      --muted:     #4a6070;
+      --white:     #eef4f8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── Custom cursor ── */
+    #cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--cyan);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.08s ease, width 0.2s, height 0.2s, background 0.2s;
+      mix-blend-mode: screen;
+    }
+    #cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1px solid var(--cyan);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.18s ease, width 0.2s, height 0.2s, opacity 0.2s;
+      opacity: 0.5;
+    }
+    body:has(a:hover) #cursor, body:has(button:hover) #cursor { width: 18px; height: 18px; }
+    body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring { width: 56px; height: 56px; opacity: 0.2; }
+
+    /* ── Scanline overlay ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.04) 2px,
+        rgba(0,0,0,0.04) 4px
+      );
+      pointer-events: none;
+      z-index: 9000;
+    }
+
+    /* ── Noise texture ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 8999;
+      opacity: 0.4;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8,12,16,0.85);
+      backdrop-filter: blur(12px);
+    }
+    .nav-logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--cyan);
+      letter-spacing: 0.1em;
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--muted); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--cyan); }
+
+    /* ── Page sections ── */
+    section { padding: 7rem 3rem; max-width: 1100px; margin: 0 auto; }
+
+    /* ── Hero ── */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding-top: 8rem;
+      position: relative;
+      max-width: 100%;
+    }
+    .hero-inner { max-width: 1100px; margin: 0 auto; padding: 0 3rem; }
+
+    .hero-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--cyan);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.2s forwards;
+    }
+    .hero-eyebrow::before { content: '> '; color: var(--muted); }
+
+    h1.hero-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 14vw, 13rem);
+      line-height: 0.9;
+      color: var(--white);
+      letter-spacing: 0.02em;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.35s forwards;
+    }
+    h1.hero-name .accent { color: var(--cyan); }
+
+    .hero-tagline {
+      margin-top: 2rem;
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 480px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.55s forwards;
+    }
+
+    .hero-cta {
+      margin-top: 3rem;
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.7s forwards;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.75rem 1.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border: 1px solid;
+      cursor: none;
+      transition: all 0.25s ease;
+    }
+    .btn-primary {
+      background: var(--cyan);
+      color: var(--bg);
+      border-color: var(--cyan);
+    }
+    .btn-primary:hover { background: transparent; color: var(--cyan); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border-color: var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    /* Animated background grid */
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 70% 60% at 80% 50%, black 0%, transparent 100%);
+      pointer-events: none;
+      opacity: 0;
+      animation: fadeIn 1.5s ease 0.5s forwards;
+    }
+
+    /* ── Section headings ── */
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--cyan);
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .section-label::before { content: '// '; color: var(--muted); }
+
+    h2.section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 3.5rem;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── About ── */
+    #about { border-top: 1px solid var(--border); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+    .about-text p { color: var(--text); margin-bottom: 1.25rem; font-size: 1.05rem; }
+    .about-text p strong { color: var(--white); font-weight: 500; }
+
+    .skills-block { }
+    .skills-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+      margin-top: 2rem;
+    }
+    .skills-title:first-child { margin-top: 0; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      padding: 0.3rem 0.75rem;
+      border: 1px solid var(--border);
+      color: var(--text);
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+    .tag:hover { border-color: var(--cyan); color: var(--cyan); }
+    .tag.highlight { border-color: rgba(0,229,255,0.3); color: var(--cyan); background: rgba(0,229,255,0.05); }
+
+    /* ── Projects ── */
+    #projects { border-top: 1px solid var(--border); }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.5rem;
+    }
+
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      display: block;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .project-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--cyan);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    .project-card:hover { border-color: rgba(0,229,255,0.3); transform: translateY(-3px); }
+    .project-card:hover::before { transform: scaleX(1); }
+
+    .card-featured { grid-column: span 7; }
+    .card-secondary { grid-column: span 5; }
+    .card-third { grid-column: span 4; }
+    .card-fourth { grid-column: span 4; }
+    .card-fifth { grid-column: span 4; }
+
+    .card-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+      margin-bottom: 1.5rem;
+    }
+    .card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.9rem;
+      color: var(--white);
+      letter-spacing: 0.03em;
+      margin-bottom: 0.75rem;
+      line-height: 1;
+    }
+    .card-featured .card-title { font-size: 2.6rem; }
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.65;
+      margin-bottom: 1.5rem;
+    }
+    .card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem; }
+    .card-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      padding: 0.2rem 0.55rem;
+      background: rgba(0,229,255,0.07);
+      color: var(--cyan-dim);
+      border: 1px solid rgba(0,229,255,0.15);
+      letter-spacing: 0.05em;
+    }
+    .card-link {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--cyan);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+    }
+    .card-link svg { transition: transform 0.2s; }
+    .project-card:hover .card-link svg { transform: translate(3px, -3px); }
+
+    .card-featured-badge {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: var(--bg);
+      background: var(--cyan);
+      padding: 0.25rem 0.6rem;
+      text-transform: uppercase;
+    }
+
+    /* ── Contact ── */
+    #contact { border-top: 1px solid var(--border); }
+    .contact-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+    .contact-text p { font-size: 1.05rem; color: var(--text); margin-bottom: 1.25rem; }
+    .contact-links { display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem; }
+    .contact-link {
+      display: flex; align-items: center; gap: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 1rem 1.25rem;
+      border: 1px solid var(--border);
+      transition: all 0.25s;
+      letter-spacing: 0.05em;
+    }
+    .contact-link:hover { border-color: var(--cyan); color: var(--cyan); background: rgba(0,229,255,0.04); }
+    .contact-link-icon {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border);
+      color: var(--cyan);
+      flex-shrink: 0;
+      transition: background 0.25s;
+    }
+    .contact-link:hover .contact-link-icon { background: rgba(0,229,255,0.1); }
+
+    /* Terminal widget */
+    .terminal {
+      background: #060a0e;
+      border: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+    }
+    .terminal-bar {
+      padding: 0.65rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+    .terminal-body { padding: 1.25rem 1.5rem; line-height: 2; }
+    .t-muted { color: var(--muted); }
+    .t-cyan { color: var(--cyan); }
+    .t-green { color: var(--green); }
+    .t-amber { color: var(--amber); }
+    .t-white { color: var(--white); }
+    .blink {
+      display: inline-block;
+      width: 8px; height: 1em;
+      background: var(--cyan);
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+    footer a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    footer a:hover { color: var(--cyan); }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0; }
+    }
+
+    /* Scroll-reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { gap: 1.5rem; }
+      section { padding: 5rem 1.5rem; }
+      .hero-inner { padding: 0 1.5rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .card-featured, .card-secondary, .card-third, .card-fourth, .card-fifth {
+        grid-column: span 12;
+      }
+      .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
+      footer { flex-direction: column; gap: 0.75rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="cursor"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">FF<span>.io</span></a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="https://github.com/feliperflores" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <div id="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+      <p class="hero-eyebrow">Software Engineer</p>
+      <h1 class="hero-name">Felipe<br><span class="accent">Flores</span></h1>
+      <p class="hero-tagline">
+        Building full-stack applications with TypeScript, React, and a taste for clean architecture.
+      </p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">View Projects</a>
+        <a href="#contact" class="btn btn-ghost">Get In Touch</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <p class="section-label reveal">About</p>
+    <h2 class="section-title reveal">Who I Am</h2>
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>
+          I'm a software engineer who enjoys building things end-to-end — from
+          <strong>Spring Boot APIs</strong> to <strong>React frontends</strong>, with a growing
+          focus on modern TypeScript tooling and developer experience.
+        </p>
+        <p>
+          I care about code quality: linting, formatting, testing, and meaningful commit
+          history aren't afterthoughts. I also actively study systems design and algorithms,
+          keeping my fundamentals sharp alongside practical project work.
+        </p>
+        <p>
+          When I'm not coding I'm tinkering with Linux, self-hosting services on my homelab,
+          and exploring how AI tools can accelerate real software workflows.
+        </p>
+      </div>
+      <div class="skills-block reveal">
+        <p class="skills-title">Languages</p>
+        <div class="tag-list">
+          <span class="tag highlight">TypeScript</span>
+          <span class="tag highlight">JavaScript</span>
+          <span class="tag">Java</span>
+          <span class="tag">Go</span>
+          <span class="tag">Python</span>
+          <span class="tag">CSS</span>
+        </div>
+        <p class="skills-title">Frameworks & Tools</p>
+        <div class="tag-list">
+          <span class="tag highlight">React</span>
+          <span class="tag highlight">Next.js</span>
+          <span class="tag highlight">Vite</span>
+          <span class="tag">Spring Boot</span>
+          <span class="tag">Tailwind CSS</span>
+          <span class="tag">Node.js</span>
+          <span class="tag">Vitest</span>
+          <span class="tag">ESLint</span>
+        </div>
+        <p class="skills-title">Infrastructure & Other</p>
+        <div class="tag-list">
+          <span class="tag">Linux</span>
+          <span class="tag">Docker</span>
+          <span class="tag">Git</span>
+          <span class="tag">Vercel</span>
+          <span class="tag">GitHub Actions</span>
+          <span class="tag">Maven</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <p class="section-label reveal">Work</p>
+    <h2 class="section-title reveal">Selected Projects</h2>
+    <div class="projects-grid">
+
+      <!-- Card 1 — Featured -->
+      <a class="project-card card-featured reveal"
+         href="https://github.com/feliperflores/claude-artifacts"
+         target="_blank" rel="noopener">
+        <span class="card-featured-badge">Featured</span>
+        <p class="card-number">01 — 2025</p>
+        <h3 class="card-title">Claude Artifacts</h3>
+        <p class="card-desc">
+          A multi-tool React app built for software engineering interview prep. Features an
+          interactive system design cheatsheet, a terminal-themed DSA reference with a
+          built-in 45-minute timer, a real-time WebSockets pub/sub visualizer, and
+          Anki-style flashcards. Production-grade setup with Vite, Tailwind CSS 4, and React 19.
+        </p>
+        <div class="card-tags">
+          <span class="card-tag">React 19</span>
+          <span class="card-tag">Vite</span>
+          <span class="card-tag">Tailwind CSS 4</span>
+          <span class="card-tag">JavaScript</span>
+        </div>
+        <span class="card-link">
+          View on GitHub
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M7 17L17 7M17 7H7M17 7v10"/>
+          </svg>
+        </span>
+      </a>
+
+      <!-- Card 2 -->
+      <a class="project-card card-third reveal"
+         href="https://github.com/feliperflores/pokedex"
+         target="_blank" rel="noopener">
+        <p class="card-number">03 — 2024</p>
+        <h3 class="card-title">Pokédex</h3>
+        <p class="card-desc">
+          A Pokémon browser built with TypeScript, Vite, and Tailwind. The most
+          professionally structured personal project: Husky git hooks, commitlint,
+          ESLint, Prettier, and a Vitest test suite.
+        </p>
+        <div class="card-tags">
+          <span class="card-tag">TypeScript</span>
+          <span class="card-tag">Vite</span>
+          <span class="card-tag">Vitest</span>
+          <span class="card-tag">Husky</span>
+        </div>
+        <span class="card-link">
+          View on GitHub
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M7 17L17 7M17 7H7M17 7v10"/>
+          </svg>
+        </span>
+      </a>
+
+      <!-- Card 3 -->
+      <a class="project-card card-fourth reveal"
+         href="https://github.com/feliperflores/react-to-do-list"
+         target="_blank" rel="noopener">
+        <p class="card-number">04 — 2024</p>
+        <h3 class="card-title">React To-Do</h3>
+        <p class="card-desc">
+          A task management app in React + TypeScript with Tailwind styling. Clean
+          component architecture and 21 commits of iterative development.
+        </p>
+        <div class="card-tags">
+          <span class="card-tag">React</span>
+          <span class="card-tag">TypeScript</span>
+          <span class="card-tag">Tailwind</span>
+        </div>
+        <span class="card-link">
+          View on GitHub
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M7 17L17 7M17 7H7M17 7v10"/>
+          </svg>
+        </span>
+      </a>
+
+      <!-- Card 4 -->
+      <a class="project-card card-fifth reveal"
+         href="https://github.com/feliperflores/MyNotes"
+         target="_blank" rel="noopener">
+        <p class="card-number">05 — 2021</p>
+        <h3 class="card-title">MyNotes</h3>
+        <p class="card-desc">
+          A notes REST API built with Java and Spring Boot. Maven project structure
+          with full IDE config. Demonstrates backend fundamentals and multi-language range.
+        </p>
+        <div class="card-tags">
+          <span class="card-tag">Java</span>
+          <span class="card-tag">Spring Boot</span>
+          <span class="card-tag">Maven</span>
+        </div>
+        <span class="card-link">
+          View on GitHub
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M7 17L17 7M17 7H7M17 7v10"/>
+          </svg>
+        </span>
+      </a>
+
+      <!-- Card 5 -->
+      <a class="project-card card-secondary reveal"
+         href="https://github.com/feliperflores/nextjs-dashboard"
+         target="_blank" rel="noopener">
+        <p class="card-number">02 — 2024</p>
+        <h3 class="card-title">Next.js Dashboard</h3>
+        <p class="card-desc">
+          Full-stack financial dashboard with authentication middleware, server components,
+          and a live Vercel deployment. Built end-to-end with Next.js App Router, TypeScript,
+          and Tailwind. Demonstrates real auth flows and data fetching patterns.
+        </p>
+        <div class="card-tags">
+          <span class="card-tag">Next.js</span>
+          <span class="card-tag">TypeScript</span>
+          <span class="card-tag">Auth.js</span>
+          <span class="card-tag">Vercel</span>
+        </div>
+        <span class="card-link">
+          View on GitHub
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M7 17L17 7M17 7H7M17 7v10"/>
+          </svg>
+        </span>
+      </a>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <p class="section-label reveal">Contact</p>
+    <h2 class="section-title reveal">Let's Talk</h2>
+    <div class="contact-inner">
+      <div class="contact-text reveal">
+        <p>
+          I'm open to new opportunities, collaborations, or just a good conversation
+          about software, systems, and technology.
+        </p>
+        <p>
+          The best way to reach me is through GitHub or LinkedIn — or feel free to
+          drop an email directly.
+        </p>
+        <div class="contact-links">
+          <a class="contact-link" href="https://github.com/feliperflores" target="_blank" rel="noopener">
+            <span class="contact-link-icon">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+              </svg>
+            </span>
+            github.com/feliperflores
+          </a>
+          <a class="contact-link" href="https://www.linkedin.com/in/felipe-roque-flores" target="_blank" rel="noopener">
+            <span class="contact-link-icon">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.785-1.75-1.75s.784-1.75 1.75-1.75 1.75.785 1.75 1.75-.784 1.75-1.75 1.75zm13.5 11.268h-3v-5c0-1.191-.021-2.724-1.661-2.724s-1.915 1.297-1.915 2.636v5h-3v-10h2.881v1.367h.041c.401-.759 1.381-1.561 2.843-1.561 3.042 0 3.604 2.002 3.604 4.599v5z"/>
+              </svg>
+            </span>
+            Felipe Flores
+          </a>
+        </div>
+      </div>
+
+      <!-- Terminal widget -->
+      <div class="terminal reveal">
+        <div class="terminal-bar">
+          <span class="dot dot-r"></span>
+          <span class="dot dot-y"></span>
+          <span class="dot dot-g"></span>
+        </div>
+        <div class="terminal-body">
+          <div><span class="t-muted">~</span> <span class="t-cyan">cat</span> <span class="t-white">profile.json</span></div>
+          <div>&nbsp;</div>
+          <div><span class="t-muted">{</span></div>
+          <div>&nbsp; <span class="t-amber">"name"</span><span class="t-muted">:</span> <span class="t-green">"Felipe Flores"</span><span class="t-muted">,</span></div>
+          <div>&nbsp; <span class="t-amber">"role"</span><span class="t-muted">:</span> <span class="t-green">"Software Engineer"</span><span class="t-muted">,</span></div>
+          <div>&nbsp; <span class="t-amber">"stack"</span><span class="t-muted">: [</span><span class="t-green">"TS"</span><span class="t-muted">,</span> <span class="t-green">"React"</span><span class="t-muted">,</span> <span class="t-green">"Java"</span><span class="t-muted">],</span></div>
+          <div>&nbsp; <span class="t-amber">"open_to_work"</span><span class="t-muted">:</span> <span class="t-cyan">true</span></div>
+          <div><span class="t-muted">}</span></div>
+          <div>&nbsp;</div>
+          <div><span class="t-muted">~</span> <span class="blink"></span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2026 Felipe Flores</span>
+    <span>Built with HTML, CSS & JS — hosted on <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a></span>
+  </footer>
+
+  <script>
+    // ── Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring   = document.getElementById('cursor-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top  = my + 'px';
+    });
+
+    (function animateRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top  = ry + 'px';
+      requestAnimationFrame(animateRing);
+    })();
+
+    // ── Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          // Stagger siblings in the same parent
+          const siblings = [...entry.target.parentElement.querySelectorAll('.reveal:not(.visible)')];
+          const idx = siblings.indexOf(entry.target);
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, idx * 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+    reveals.forEach(el => observer.observe(el));
+
+    // ── Smooth nav links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
