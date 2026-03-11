@@ -46,4 +46,4 @@ Feel free to reach out. I'm open to new opportunities, collaborations, or just a
 
 ---
 
-Built with HTML, CSS & JS — hosted on [GitHub Pages](https://pages.github.com).
+Built with HTML, CSS & JS.
