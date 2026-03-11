@@ -1,6 +1,6 @@
 # feliperflores.github.io
 
-My personal portfolio and developer profile, built with HTML, CSS, and vanilla JavaScript — hosted on GitHub Pages.
+My personal portfolio and developer profile, built with HTML, CSS, and vanilla JavaScript.
 
 ## About Me
 
@@ -10,12 +10,22 @@ I care about code quality: linting, formatting, testing, and meaningful commit h
 
 When I'm not coding I'm tinkering with Linux, self-hosting services on my homelab, and exploring how AI tools can accelerate real software workflows.
 
-## Tech Stack
+## Skills
 
-- **Languages**: TypeScript, JavaScript, Java, Go, Python, CSS
-- **Frontend**: React, Next.js, Vite, Tailwind CSS
-- **Backend**: Spring Boot, Node.js
-- **Tools**: Vitest, ESLint, Git, Docker, Vercel, GitHub Actions, Maven
+### Languages
+TypeScript, JavaScript, Java, Go, Python, CSS, SQL, HTML
+
+### Frameworks & Libraries
+React, Next.js, Vite, Spring Boot, Tailwind CSS, Node.js, Vitest, ESLint, SAPUI5, Mocha, Sinon
+
+### Testing
+Unit Testing, Component Testing, TDD, QUnit, OPA5
+
+### Practices & Methods
+OOP, Agile, Scrum, Algorithms, Problem Solving, Code Refactoring, Debugging
+
+### Tools & Infrastructure
+Linux, Docker, Git, Vercel, GitHub Actions, Maven, Jenkins, Jira, Vim, GitHub Copilot
 
 ## Featured Projects
 
