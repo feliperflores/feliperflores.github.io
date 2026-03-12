@@ -4,9 +4,9 @@ My personal portfolio and developer profile, built with HTML, CSS, and vanilla J
 
 ## About Me
 
-I'm a software engineer who enjoys building things end-to-end — from Spring Boot APIs to React frontends, with a focus on modern TypeScript tooling and developer experience.
+I'm a software engineer who enjoys building things end-to-end. From Spring Boot APIs to React frontends, who cares about modern TypeScript tooling and developer experience.
 
-I care about code quality: linting, formatting, testing, and meaningful commit history aren't afterthoughts. I also actively study systems design and algorithms, keeping my fundamentals sharp alongside practical project work.
+I care about code quality: linting, formatting, testing, and meaningful commit history matters to me. I also actively study systems design and algorithms, to stay sharp on CS fundamentals alongside practical project work.
 
 When I'm not coding I'm tinkering with Linux, self-hosting services on my homelab, and exploring how AI tools can accelerate real software workflows.
 
@@ -42,7 +42,7 @@ Linux, Docker, Git, Vercel, GitHub Actions, Maven, Jenkins, Jira, Vim, GitHub Co
 - [GitHub](https://github.com/feliperflores)
 - [LinkedIn](https://www.linkedin.com/in/felipe-roque-flores)
 
-Feel free to reach out. I'm open to new opportunities, collaborations, or just a good conversation about software, systems, and technology.
+Feel free to reach out. I'm open to new opportunities, collaborations, or just a good conversation about full-stack development.
 
 ---
 
